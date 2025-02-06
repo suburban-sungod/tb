@@ -244,10 +244,9 @@
         );
       }
       
-      // Photo selection screen remains unchanged.
+      // PhotoSelectionScreen remains unchanged.
       function PhotoSelectionScreen({ product, onBack, onNext }) {
         const [selectedPhotos, setSelectedPhotos] = useState([]);
-        // Filter states
         const [filterMode, setFilterMode] = useState(null);
         const [family, setFamily] = useState("");
         const [dateStart, setDateStart] = useState("");
@@ -314,7 +313,6 @@
                 </button>
               </div>
               <p className="text-sm text-gray-500 mt-2">{instruction}</p>
-              {/* Filters Section */}
               <div className="mt-4">
                 <div className="flex items-center mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -424,9 +422,8 @@
         );
       }
       
-      // Delivery Options screen now renamed and structured with a delivery method
+      // Delivery Options Screen (formerly RecipientsScreen)
       function DeliveryOptionsScreen({ product, deliveryInfo, setDeliveryInfo, onBack, onNext }) {
-        // If deliveryInfo exists, use its method; otherwise default to "ship"
         const [deliveryMethod, setDeliveryMethod] = useState(
           deliveryInfo && deliveryInfo.method ? deliveryInfo.method : "ship"
         );
@@ -463,14 +460,14 @@
             <div className="mb-4">
               <span className="text-xl font-bold">Total Price: ${totalPrice}</span>
             </div>
+            {/* Delivery method buttons in a flex row so they're equal size */}
             <div className="mb-4 flex space-x-4">
               <button 
                 onClick={() => {
                   setDeliveryMethod("ship");
-                  // Reset shipping recipients if switching methods
                   setRecipients([{ name: "", address: "", message: "" }]);
                 }}
-                className={`px-4 py-2 border rounded-md ${deliveryMethod==="ship" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
+                className={`flex-1 px-4 py-2 border rounded-md ${deliveryMethod==="ship" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
               >
                 Ship direct
               </button>
@@ -479,7 +476,7 @@
                   setDeliveryMethod("collect");
                   setSelectedStore(null);
                 }}
-                className={`px-4 py-2 border rounded-md ${deliveryMethod==="collect" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
+                className={`flex-1 px-4 py-2 border rounded-md ${deliveryMethod==="collect" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
               >
                 Collect at your local GeneralStore
               </button>
@@ -581,7 +578,7 @@
         );
       }
       
-      // Payment screen reads from deliveryInfo.method for pricing and display.
+      // Payment Screen: Header now shows Order Summary next to Back; remove extra titles.
       function PaymentScreen({ product, deliveryInfo, onBack }) {
         const basePrices = {
           "Photo Book": 39.99,
@@ -599,10 +596,11 @@
       
         return (
           <div className="flex flex-col h-full p-4">
-            <button onClick={onBack} className="text-blue-500 mb-2">Back</button>
-            <h2 className="text-lg font-semibold mb-4">Payment</h2>
+            <div className="flex items-center mb-4">
+              <button onClick={onBack} className="text-blue-500">Back</button>
+              <h2 className="text-lg font-semibold ml-4">Order Summary</h2>
+            </div>
             <div className="border rounded p-4 mb-4">
-              <h3 className="font-bold mb-2">Order Summary</h3>
               <p><strong>Product:</strong> {product}</p>
               <p><strong>Delivery:</strong> {deliveryText}</p>
               <p><strong>Total:</strong> ${totalPrice}</p>
