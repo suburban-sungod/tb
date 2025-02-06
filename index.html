@@ -157,7 +157,7 @@
         );
       }
       
-      // Store page: Updated title, subtitle, and product order: Mugs, Calendars, Photo Books.
+      // Store Screen with updated title, subtitle and product order: Mugs, Calendars, Photo Books.
       function StoreScreen({ onProductSelect }) {
         return (
           <div className="main-content">
@@ -244,7 +244,7 @@
         );
       }
       
-      // PhotoSelectionScreen now uses empty grey boxes (by omitting the image tag)
+      // PhotoSelectionScreen now shows empty grey boxes, with a callout box and extra whitespace at the bottom.
       function PhotoSelectionScreen({ product, onBack, onNext }) {
         const [selectedPhotos, setSelectedPhotos] = useState([]);
         const [filterMode, setFilterMode] = useState(null);
@@ -404,7 +404,7 @@
                       className={`photo-item ${selectedPhotos.includes(index) ? "selected" : ""}`}
                       onClick={() => togglePhoto(index)}
                     >
-                      {/* Removed <img> tag to show an empty grey box */}
+                      {/* No <img> tag: empty grey box */}
                       {product === "Calendar" &&
                         selectedPhotos.includes(index) && (
                           <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
@@ -413,6 +413,15 @@
                         )}
                     </div>
                   ))}
+              </div>
+              {/* Callout box */}
+              <div className="p-4">
+                <div className="bg-green-100 p-4 rounded-md mt-4">
+                  <p className="text-gray-700">
+                    Want even more customisation options? Try our <a href="https://tinybeans.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">new web editor</a> on your tablet or computer!
+                  </p>
+                </div>
+                <div style={{ height: "100px" }}></div>
               </div>
             </div>
           </div>
