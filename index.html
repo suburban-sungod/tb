@@ -77,7 +77,6 @@
       .photo-item.selected {
         opacity: 0.7;
       }
-      /* Move tick to top-right so it doesn't cover the photo number */
       .photo-item.selected::after {
         content: '✓';
         position: absolute;
@@ -91,6 +90,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        pointer-events: none;
       }
     </style>
   </head>
@@ -105,7 +105,7 @@
     
     <script type="text/babel">
       const { useState, useEffect } = React;
-
+      
       // Global Header with Tinybeans logo
       function Header() {
         return (
@@ -157,7 +157,7 @@
         );
       }
       
-      // Store Screen: Updated title/subtitle and product order: Mugs, Calendars, Photo Books.
+      // Store Screen: "Create & print" title, updated subtitle, and product order: Mugs, Calendars, Photo Books.
       function StoreScreen({ onProductSelect }) {
         return (
           <div className="main-content">
@@ -244,7 +244,7 @@
         );
       }
       
-      // PhotoSelectionScreen now shows empty grey boxes with numbered labels.
+      // PhotoSelectionScreen: Shows grey boxes with numbered labels that shuffle on filter change.
       function PhotoSelectionScreen({ product, onBack, onNext }) {
         const [selectedPhotos, setSelectedPhotos] = useState([]);
         const [filterMode, setFilterMode] = useState(null);
@@ -252,19 +252,21 @@
         const [dateStart, setDateStart] = useState("");
         const [dateEnd, setDateEnd] = useState("");
         const [album, setAlbum] = useState("");
-
-        // Create a shuffled order for photo labels (1-15)
-        const [shuffledOrder, setShuffledOrder] = useState([...Array(15).keys()].map(i => i + 1));
-
+        
+        // Shuffled order for labels 1-15
+        const [shuffledOrder, setShuffledOrder] = useState(
+          [...Array(15).keys()].map((i) => i + 1)
+        );
+        
         useEffect(() => {
-          const arr = [...Array(15).keys()].map(i => i + 1);
+          const arr = [...Array(15).keys()].map((i) => i + 1);
           for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [arr[i], arr[j]] = [arr[j], arr[i]];
           }
           setShuffledOrder(arr);
         }, [filterMode, family, dateStart, dateEnd, album]);
-
+        
         let requiredCount = 0;
         let instruction = "";
         let isValid = false;
@@ -280,7 +282,7 @@
           instruction = `Select 13 photos (1 Cover + 12 months). (${selectedPhotos.length} selected)`;
           isValid = selectedPhotos.length === requiredCount;
         }
-
+        
         const calendarLabels =
           product === "Calendar"
             ? [
@@ -299,7 +301,17 @@
                 "December",
               ]
             : [];
-
+        
+        const togglePhoto = (index) => {
+          if (selectedPhotos.includes(index)) {
+            setSelectedPhotos(selectedPhotos.filter((i) => i !== index));
+          } else {
+            if (product === "Calendar" && selectedPhotos.length >= 13) return;
+            if (product === "Photo Mug" && selectedPhotos.length >= 2) return;
+            setSelectedPhotos([...selectedPhotos, index]);
+          }
+        };
+        
         return (
           <div className="flex flex-col h-full">
             <div className="p-4 border-b">
@@ -403,27 +415,35 @@
                   .map((_, index) => (
                     <div
                       key={index}
-                      className={`photo-item ${selectedPhotos.includes(index) ? "selected" : ""}`}
+                      className={`photo-item pointer-events-auto ${selectedPhotos.includes(index) ? "selected" : ""}`}
                       onClick={() => togglePhoto(index)}
                     >
-                      {/* Show the photo label */}
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-lg font-semibold">
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-xs pointer-events-none">
                         Photo {shuffledOrder[index]}
                       </div>
                       {product === "Calendar" &&
                         selectedPhotos.includes(index) && (
-                          <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+                          <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-md pointer-events-none">
                             {calendarLabels[selectedPhotos.indexOf(index)]}
                           </div>
                         )}
                     </div>
                   ))}
               </div>
-              {/* Callout box with extra whitespace */}
+              {/* Callout box and extra whitespace */}
               <div className="p-4">
                 <div className="bg-green-100 p-4 rounded-md mt-4">
                   <p className="text-gray-700">
-                    Want even more customisation options? Try our <a href="https://tinybeans.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">new web editor</a> on your tablet or computer!
+                    Want even more customisation options? Try our{" "}
+                    <a
+                      href="https://tinybeans.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      new web editor
+                    </a>{" "}
+                    on your tablet or computer!
                   </p>
                 </div>
                 <div style={{ height: "100px" }}></div>
@@ -433,7 +453,7 @@
         );
       }
       
-      // Delivery Options Screen remains unchanged from previous version.
+      // Delivery Options Screen: Added quantity input for "Collect" option.
       function DeliveryOptionsScreen({ product, deliveryInfo, setDeliveryInfo, onBack, onNext }) {
         const [deliveryMethod, setDeliveryMethod] = useState(
           deliveryInfo && deliveryInfo.method ? deliveryInfo.method : "ship"
@@ -446,6 +466,9 @@
         const [selectedStore, setSelectedStore] = useState(
           deliveryMethod === "collect" && deliveryInfo && deliveryInfo.selectedStore ? deliveryInfo.selectedStore : null
         );
+        const [quantity, setQuantity] = useState(
+          deliveryMethod === "collect" && deliveryInfo && deliveryInfo.quantity ? deliveryInfo.quantity : 1
+        );
         const basePrices = {
           "Photo Book": 39.99,
           Calendar: 29.99,
@@ -454,14 +477,14 @@
         const totalPrice =
           deliveryMethod === "ship"
             ? (basePrices[product] * recipients.length).toFixed(2)
-            : basePrices[product].toFixed(2);
-
+            : (basePrices[product] * quantity).toFixed(2);
+      
         const stores = [
           { suburb: "Bondi", distance: "5 km", time: "10 mins" },
           { suburb: "Parramatta", distance: "20 km", time: "25 mins" },
           { suburb: "Surry Hills", distance: "3 km", time: "8 mins" },
         ];
-
+      
         return (
           <div className="flex flex-col h-full p-4">
             <div className="flex items-center mb-4">
@@ -565,6 +588,16 @@
                     <p>{store.distance} - {store.time}</p>
                   </div>
                 ))}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                    className="border rounded p-2 w-full"
+                  />
+                </div>
               </div>
             )}
             <button 
@@ -576,7 +609,7 @@
                 if (deliveryMethod === "ship") {
                   setDeliveryInfo({ method: "ship", recipients });
                 } else {
-                  setDeliveryInfo({ method: "collect", selectedStore });
+                  setDeliveryInfo({ method: "collect", selectedStore, quantity });
                 }
                 onNext();
               }}
@@ -597,12 +630,14 @@
         };
         const totalPrice =
           deliveryInfo.method === "collect"
-            ? basePrices[product].toFixed(2)
+            ? (basePrices[product] * deliveryInfo.quantity).toFixed(2)
             : (basePrices[product] * deliveryInfo.recipients.length).toFixed(2);
         const deliveryText =
           deliveryInfo.method === "collect"
-            ? deliveryInfo.selectedStore
-            : deliveryInfo.recipients.map((r) => r.name.trim() || "Unnamed").join(", ");
+            ? `${deliveryInfo.selectedStore} (x${deliveryInfo.quantity})`
+            : deliveryInfo.recipients
+                .map((r) => r.name.trim() || "Unnamed")
+                .join(", ");
       
         return (
           <div className="flex flex-col h-full p-4">
