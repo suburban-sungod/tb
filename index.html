@@ -157,7 +157,7 @@
         );
       }
       
-      // Store page: updated title/subtitle and product order.
+      // Store page: Updated title, subtitle, and product order: Mugs, Calendars, Photo Books.
       function StoreScreen({ onProductSelect }) {
         return (
           <div className="main-content">
@@ -244,7 +244,7 @@
         );
       }
       
-      // PhotoSelectionScreen: using a public placeholder image that works both locally and on GitHub.
+      // PhotoSelectionScreen now uses empty grey boxes (by omitting the image tag)
       function PhotoSelectionScreen({ product, onBack, onNext }) {
         const [selectedPhotos, setSelectedPhotos] = useState([]);
         const [filterMode, setFilterMode] = useState(null);
@@ -404,11 +404,7 @@
                       className={`photo-item ${selectedPhotos.includes(index) ? "selected" : ""}`}
                       onClick={() => togglePhoto(index)}
                     >
-                      <img
-                        src="https://picsum.photos/200/200"
-                        alt={`Photo ${index + 1}`}
-                        className="w-full h-full object-cover rounded-md"
-                      />
+                      {/* Removed <img> tag to show an empty grey box */}
                       {product === "Calendar" &&
                         selectedPhotos.includes(index) && (
                           <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
@@ -578,7 +574,7 @@
         );
       }
       
-      // Payment Screen: Header shows Order Summary next to Back; summary box simplified.
+      // Payment Screen: Header shows "Order Summary" next to Back; summary box simplified.
       function PaymentScreen({ product, deliveryInfo, onBack }) {
         const basePrices = {
           "Photo Book": 39.99,
