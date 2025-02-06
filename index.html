@@ -77,12 +77,12 @@
       .photo-item.selected {
         opacity: 0.7;
       }
+      /* Move tick to top-right so it doesn't cover the photo number */
       .photo-item.selected::after {
         content: '✓';
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 4px;
+        right: 4px;
         color: white;
         background: #3b82f6;
         border-radius: 50%;
@@ -157,7 +157,7 @@
         );
       }
       
-      // Store Screen with updated title, subtitle and product order: Mugs, Calendars, Photo Books.
+      // Store Screen: Updated title/subtitle and product order: Mugs, Calendars, Photo Books.
       function StoreScreen({ onProductSelect }) {
         return (
           <div className="main-content">
@@ -244,7 +244,7 @@
         );
       }
       
-      // PhotoSelectionScreen now shows empty grey boxes, with a callout box and extra whitespace at the bottom.
+      // PhotoSelectionScreen now shows empty grey boxes with numbered labels.
       function PhotoSelectionScreen({ product, onBack, onNext }) {
         const [selectedPhotos, setSelectedPhotos] = useState([]);
         const [filterMode, setFilterMode] = useState(null);
@@ -253,15 +253,17 @@
         const [dateEnd, setDateEnd] = useState("");
         const [album, setAlbum] = useState("");
 
-        const togglePhoto = (index) => {
-          if (selectedPhotos.includes(index)) {
-            setSelectedPhotos(selectedPhotos.filter((i) => i !== index));
-          } else {
-            if (product === "Calendar" && selectedPhotos.length >= 13) return;
-            if (product === "Photo Mug" && selectedPhotos.length >= 2) return;
-            setSelectedPhotos([...selectedPhotos, index]);
+        // Create a shuffled order for photo labels (1-15)
+        const [shuffledOrder, setShuffledOrder] = useState([...Array(15).keys()].map(i => i + 1));
+
+        useEffect(() => {
+          const arr = [...Array(15).keys()].map(i => i + 1);
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
           }
-        };
+          setShuffledOrder(arr);
+        }, [filterMode, family, dateStart, dateEnd, album]);
 
         let requiredCount = 0;
         let instruction = "";
@@ -404,7 +406,10 @@
                       className={`photo-item ${selectedPhotos.includes(index) ? "selected" : ""}`}
                       onClick={() => togglePhoto(index)}
                     >
-                      {/* No <img> tag: empty grey box */}
+                      {/* Show the photo label */}
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-lg font-semibold">
+                        Photo {shuffledOrder[index]}
+                      </div>
                       {product === "Calendar" &&
                         selectedPhotos.includes(index) && (
                           <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
@@ -414,7 +419,7 @@
                     </div>
                   ))}
               </div>
-              {/* Callout box */}
+              {/* Callout box with extra whitespace */}
               <div className="p-4">
                 <div className="bg-green-100 p-4 rounded-md mt-4">
                   <p className="text-gray-700">
@@ -428,7 +433,7 @@
         );
       }
       
-      // Delivery Options Screen
+      // Delivery Options Screen remains unchanged from previous version.
       function DeliveryOptionsScreen({ product, deliveryInfo, setDeliveryInfo, onBack, onNext }) {
         const [deliveryMethod, setDeliveryMethod] = useState(
           deliveryInfo && deliveryInfo.method ? deliveryInfo.method : "ship"
