@@ -157,7 +157,7 @@
         );
       }
       
-      // Store page: title updated and subtitle text updated; product order: Mugs, Calendars, Photo Books
+      // Store page: title updated; product order: Mugs, Calendars, Photo Books.
       function StoreScreen({ onProductSelect }) {
         return (
           <div className="main-content">
@@ -244,7 +244,7 @@
         );
       }
       
-      // PhotoSelectionScreen remains unchanged.
+      // PhotoSelectionScreen: Updated image src to use a public placeholder.
       function PhotoSelectionScreen({ product, onBack, onNext }) {
         const [selectedPhotos, setSelectedPhotos] = useState([]);
         const [filterMode, setFilterMode] = useState(null);
@@ -314,6 +314,7 @@
               </div>
               <p className="text-sm text-gray-500 mt-2">{instruction}</p>
               <div className="mt-4">
+                {/* Filters Section */}
                 <div className="flex items-center mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-5.414 5.414A1 1 0 0015 12.414V18a1 1 0 01-1 1H10a1 1 0 01-1-1v-5.586a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z" />
@@ -404,7 +405,7 @@
                       onClick={() => togglePhoto(index)}
                     >
                       <img
-                        src="/api/placeholder/200/200"
+                        src="https://via.placeholder.com/200"
                         alt={`Photo ${index + 1}`}
                         className="w-full h-full object-cover rounded-md"
                       />
@@ -422,7 +423,7 @@
         );
       }
       
-      // Delivery Options Screen (formerly RecipientsScreen)
+      // Delivery Options Screen
       function DeliveryOptionsScreen({ product, deliveryInfo, setDeliveryInfo, onBack, onNext }) {
         const [deliveryMethod, setDeliveryMethod] = useState(
           deliveryInfo && deliveryInfo.method ? deliveryInfo.method : "ship"
@@ -460,7 +461,6 @@
             <div className="mb-4">
               <span className="text-xl font-bold">Total Price: ${totalPrice}</span>
             </div>
-            {/* Delivery method buttons in a flex row so they're equal size */}
             <div className="mb-4 flex space-x-4">
               <button 
                 onClick={() => {
@@ -578,7 +578,7 @@
         );
       }
       
-      // Payment Screen: Header now shows Order Summary next to Back; remove extra titles.
+      // Payment Screen: Header shows Order Summary next to Back; summary box simplified.
       function PaymentScreen({ product, deliveryInfo, onBack }) {
         const basePrices = {
           "Photo Book": 39.99,
